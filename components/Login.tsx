@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { UserIcon, KeyIcon, TrophyIcon } from './Icons';
+import { UserIcon, KeyIcon, TrophyIcon, QrCodeIcon } from './Icons';
+import { QRCodeScannerModal } from './QRCodeScannerModal';
 
 type TopStudentsData = { [key: string]: { name: string, score: number }[] };
 
@@ -90,12 +91,18 @@ const HonorBoard: React.FC<{ topStudentsByPeriod: TopStudentsData }> = ({ topStu
 export const Login: React.FC<LoginProps> = ({ onLogin, error, announcement, topStudentsByPeriod }) => {
   const [role, setRole] = useState<Role>('student');
   const [code, setCode] = useState('');
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onLogin(role, code);
   };
   
+  const handleScanSuccess = (decodedText: string) => {
+    onLogin('student', decodedText);
+    setIsScannerOpen(false);
+  };
+
   const isTeacher = role === 'teacher';
 
   return (
@@ -148,9 +155,21 @@ export const Login: React.FC<LoginProps> = ({ onLogin, error, announcement, topS
                           onChange={(e) => setCode(e.target.value)}
                           required
                           maxLength={isTeacher ? undefined : 4}
-                          className="appearance-none block w-full px-3 py-3 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
+                          className={`appearance-none block w-full px-3 py-3 ${isTeacher ? 'pr-10' : 'pl-12 pr-10'} border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-lg`}
                           placeholder={isTeacher ? 'أدخل الرمز الخاص بالمعلم' : 'مثال: 1234'}
                         />
+                         {!isTeacher && (
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <button
+                              type="button"
+                              onClick={() => setIsScannerOpen(true)}
+                              className="text-gray-400 hover:text-blue-600 focus:outline-none"
+                              aria-label="Scan QR code"
+                            >
+                              <QrCodeIcon className="h-6 w-6" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
     
@@ -176,6 +195,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, error, announcement, topS
               </div>
             </div>
       </div>
+       <QRCodeScannerModal 
+        isOpen={isScannerOpen} 
+        onClose={() => setIsScannerOpen(false)} 
+        onScanSuccess={handleScanSuccess} 
+      />
     </div>
   );
 };

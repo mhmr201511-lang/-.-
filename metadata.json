@@ -1,5 +1,7 @@
 {
-  "name": "سجل متابعة الطلاب",
+  "name": "Copy of سجل متابعة الطلاب",
   "description": "سجل إلكتروني لمتابعة الطلاب وإدارة التقييمات الخاصة بالأستاذ محمد الحربي.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }
